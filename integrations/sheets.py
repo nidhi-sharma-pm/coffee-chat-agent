@@ -1,4 +1,5 @@
 import os
+import re
 
 import gspread
 
@@ -7,8 +8,15 @@ from integrations import get_creds
 HEADERS = ["name", "company", "status", "last_contact", "next_step", "notes"]
 
 
+def _sheet_id():
+    """SHEET_ID can be the bare ID or the full Google Sheets link."""
+    value = os.environ["SHEET_ID"].strip()
+    match = re.search(r"/d/([\w-]+)", value)
+    return match.group(1) if match else value
+
+
 def _sheet():
-    ws = gspread.authorize(get_creds()).open_by_key(os.environ["SHEET_ID"]).sheet1
+    ws = gspread.authorize(get_creds()).open_by_key(_sheet_id()).sheet1
     if ws.row_values(1) != HEADERS:
         ws.update([HEADERS], "A1")
     return ws

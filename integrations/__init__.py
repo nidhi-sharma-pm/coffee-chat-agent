@@ -27,6 +27,10 @@ def get_creds():
         creds.refresh(Request())
     else:
         secrets = ROOT / os.getenv("GOOGLE_CREDENTIALS_PATH", "credentials.json")
+        if not secrets.exists():
+            raise FileNotFoundError(
+                "Google isn't connected yet. Download your OAuth client file as "
+                f"credentials.json into {ROOT} (see README, Setup step 3).")
         creds = InstalledAppFlow.from_client_secrets_file(secrets, SCOPES).run_local_server(port=0)
     TOKEN.write_text(creds.to_json())
     return creds
