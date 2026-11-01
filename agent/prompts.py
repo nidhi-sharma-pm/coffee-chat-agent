@@ -1,0 +1,171 @@
+"""Every prompt lives here. Edit these, then re-run evals/run_evals.py."""
+
+TONE = (
+    "Tone: warm, short, specific. No flattery, no buzzwords, no 'I hope this finds you well'. "
+    "Sound like a real person, not a template."
+)
+
+PROFILE_EXTRACT = """Extract fields from this pasted profile. Use ONLY what the text says.
+If a field is not in the text, use null. Never guess or fill gaps.
+
+Return JSON with exactly these keys:
+name, current_role, company, past_roles (list of strings), education (list of strings),
+location, topics (list of strings: what they post or talk about), linkedin_url
+
+<profile>
+{profile}
+</profile>"""
+
+BRIEF = """Write a prep brief for a coffee chat with this person.
+
+<profile>
+{profile}
+</profile>
+
+Search the web for recent work, talks, posts or company news about them. Then write markdown
+with these sections: ## Who they are, ## Recent work and news, ## Talking points, ## Questions to ask.
+
+Hard rules:
+- In the first two sections, every bullet states one fact and ends with its source as a
+  markdown link, like [source](https://...).
+- If you cannot find a source for a fact, end that bullet with [UNVERIFIED].
+- Facts from the pasted profile may cite [source](profile) instead of a URL.
+- If a search result might be a different person with the same name, leave it out.
+- Never guess. Fewer true bullets beat more shaky ones.
+- Talking points and questions are your suggestions, so they need no source."""
+
+OUTREACH = """Draft a first message asking {name} for a 20-minute coffee chat.
+
+About me: {me}
+My goal for this chat: {goal}
+
+<profile>
+{profile}
+</profile>
+
+<brief>
+{brief}
+</brief>
+
+{tone}
+Under 120 words. Mention one specific thing from the brief that is NOT marked [UNVERIFIED].
+End with an easy yes/no ask. First line must be "Subject: ..." then a blank line, then the body."""
+
+THANK_YOU = """Draft a thank-you note to {name} after our coffee chat today.
+
+About me: {me}
+
+<my_notes>
+{notes}
+</my_notes>
+
+{tone}
+Under 100 words. Refer to one or two specific things from my notes. If my notes include a
+promise I made (to send something, intro someone), say I'm doing it. Do not invent details.
+First line must be "Subject: ..." then a blank line, then the body."""
+
+CHECK_IN = """Draft a light check-in to {name}. We had a coffee chat {weeks} weeks ago.
+
+About me: {me}
+
+<my_notes>
+{notes}
+</my_notes>
+
+{tone}
+Under 90 words. Share one short update or something useful to them tied to my notes.
+No ask beyond staying in touch, unless my notes say otherwise. Do not invent details.
+First line must be "Subject: ..." then a blank line, then the body."""
+
+INVITE = """Write a 2-sentence calendar invite description for a coffee chat between {me_name}
+and {name} ({role} at {company}). Mention the goal: {goal}. Plain text, no greeting."""
+
+EVAL_JUDGE = """You are checking a prep brief for factual errors.
+
+<pasted_profile>
+{profile}
+</pasted_profile>
+
+<brief>
+{brief}
+</brief>
+
+List every claim in the brief that CONTRADICTS the pasted profile (wrong company, wrong role,
+wrong school, wrong dates, wrong person). Claims the profile simply doesn't mention are fine.
+
+Return JSON: {{"contradictions": [{{"claim": "...", "why": "..."}}]}}
+Return {{"contradictions": []}} if there are none."""
+
+LINKEDIN = """Draft LinkedIn outreach to {name}.
+
+About me: {me}
+My goal for this chat: {goal}
+
+<profile>
+{profile}
+</profile>
+
+<brief>
+{brief}
+</brief>
+
+{tone}
+Write two messages:
+1. "note": a connection request note. HARD LIMIT 280 characters including spaces.
+   Mention one specific thing from the brief that is NOT marked [UNVERIFIED].
+2. "dm": the first message to send after they accept. Under 90 words. Ask for a
+   20-minute chat with an easy yes/no.
+
+Return ONLY JSON: {{"note": "...", "dm": "..."}}"""
+
+SHORTEN = """Shorten this LinkedIn note to under {limit} characters. Keep the specific detail
+and the ask. Return only the note.
+
+{text}"""
+
+NUDGE = """Draft a gentle LinkedIn follow-up to {name}. I messaged them {days} days ago
+asking for a short coffee chat and haven't heard back.
+
+Context from my tracker: {context}
+
+{tone}
+Under 50 words. No guilt, no "just bumping this". Make it easy to say yes or no.
+Return only the message."""
+
+REPLY_TRIAGE = """Someone replied to my coffee chat request. Classify their reply.
+
+<reply>
+{reply}
+</reply>
+
+intent must be one of:
+- "yes": they agreed to chat
+- "no": they declined
+- "later": they're open but busy now
+- "question": they asked something before deciding
+
+Return ONLY JSON: {{"intent": "...", "summary": "one short sentence on what they said"}}"""
+
+REPLY_DRAFT = """Draft my LinkedIn reply to {name}.
+
+About me: {me}
+
+<my_last_message>
+{my_message}
+</my_last_message>
+
+<their_reply>
+{reply}
+</their_reply>
+
+Their intent: {intent}
+My open times (only use these if they said yes; "none" means ask what suits them):
+{times}
+
+{tone}
+Under 80 words. No subject line.
+- yes: thank them and offer 2-3 of my open times, or ask what suits them.
+- no: thank them warmly, no pushing.
+- later: thank them and say I'll reach out again in a few weeks.
+- question: answer only from what I've told you. If you can't, write [ADD ANSWER] where I need to fill in.
+Return only the message."""

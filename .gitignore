@@ -222,3 +222,7 @@ token.json
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Coffee chat agent: real people's profiles and eval output stay local
+evals/profiles/*.txt
+evals/results/
