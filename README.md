@@ -8,7 +8,7 @@ AI agent that helps me prep for and follow up on networking coffee chats.
 | Tab | What happens | Model |
 |---|---|---|
 | Today | Who hasn't replied in 7+ days (nudge draft) and who is due a check-in after 4+ weeks. One-click status updates | Haiku / Sonnet |
-| 1. Profile | Paste a profile, get clean fields | Haiku |
+| 1. Profile | Upload their LinkedIn PDF (More → Save to PDF) or paste a profile, get clean fields. The PDF is read on your Mac | Haiku |
 | 2. Brief | Prep brief with web search. Every fact has a source link or is marked `[UNVERIFIED]` | Sonnet |
 | 3. Outreach | LinkedIn connection note (under 300 chars) + first DM with copy buttons, or an email saved to Gmail drafts | Sonnet |
 | 4. Reply | Paste their LinkedIn reply: it reads yes / no / later / question, drafts your response (with your open times if yes) and updates the tracker | Haiku + Sonnet |
@@ -43,7 +43,7 @@ So the app drafts, you copy-paste and send, and the Today tab works purely from 
 
 ## Evals
 
-Save 5-6 real profiles as `.txt` files in `evals/profiles/` (they are gitignored, so they stay off GitHub), then:
+Save 5-6 real profiles as `.txt` files or LinkedIn PDFs in `evals/profiles/` (they are gitignored, so they stay off GitHub), then:
 
 ```bash
 python evals/run_evals.py

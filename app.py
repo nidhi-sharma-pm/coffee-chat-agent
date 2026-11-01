@@ -8,7 +8,7 @@ from agent.brief import make_brief
 from agent.followup import draft_check_in, draft_thank_you
 from agent.linkedin import NOTE_LIMIT, draft_linkedin, draft_nudge
 from agent.outreach import draft_outreach
-from agent.profile import parse_profile
+from agent.profile import parse_profile, pdf_to_text
 from agent.replies import INTENTS, draft_reply_response, triage_reply
 
 st.set_page_config(page_title="Coffee Chat Agent", layout="wide")
@@ -120,8 +120,25 @@ def tab_today():
         update_tracker(rows[pick]["name"], rows[pick]["company"], status=status)
 
 
+def load_pdf():
+    """Fill the paste box from the uploaded PDF so it can be checked before parsing."""
+    f = ss.get("profile_pdf")
+    if f is None:
+        return
+    text = pdf_to_text(f)
+    ss.pdf_unreadable = not text
+    if text:
+        ss.profile_text = text
+
+
 def tab_profile():
-    text = st.text_area("Paste their profile (LinkedIn About + Experience, bio, etc.)", height=300)
+    st.file_uploader("Upload their LinkedIn PDF (on their profile: More → Save to PDF)",
+                     type="pdf", key="profile_pdf", on_change=load_pdf)
+    if ss.get("pdf_unreadable"):
+        st.warning("Couldn't read text from that PDF (it may be a scan). Paste the profile instead.")
+    text = st.text_area("Or paste their profile (LinkedIn About + Experience, bio, etc.). "
+                        "An uploaded PDF fills this box so you can check it first.",
+                        height=300, key="profile_text")
     if st.button("Parse profile", disabled=not text.strip()):
         with st.spinner("Reading profile..."):
             ss.profile = parse_profile(text)

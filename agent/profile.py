@@ -1,8 +1,18 @@
+from pypdf import PdfReader
+
 from agent.llm import extract
 from agent.prompts import PROFILE_EXTRACT
 
 FIELDS = ["name", "current_role", "company", "past_roles", "education",
           "location", "topics", "linkedin_url"]
+
+
+def pdf_to_text(file):
+    """Read text from a PDF on this Mac (LinkedIn 'Save to PDF' is plain text).
+    Returns "" for scanned or image-only PDFs."""
+    pages = PdfReader(file).pages
+    text = "\n".join(page.extract_text() or "" for page in pages)
+    return "\n".join(line.rstrip() for line in text.splitlines()).strip()
 
 
 def parse_profile(text):
