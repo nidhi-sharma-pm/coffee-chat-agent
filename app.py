@@ -202,17 +202,26 @@ def tab_brief():
         st.caption("Outreach drafts will use the strongest overlap as the hook.")
 
 
+def ensure_common_ground():
+    """Find the similarity automatically if it hasn't been found yet, so drafts can use it."""
+    if "common" not in ss and (me := load_my_profile()):
+        ss.common = find_common_ground(ss.profile, me)
+    return ss.get("common", "")
+
+
 def tab_outreach():
     if not need("brief", "Generate a brief first."):
         return
     p = ss.profile
+    if not load_my_profile():
+        st.caption("Save your own profile in the Profile tab so drafts can include what you have in common.")
     goal = st.text_input("Your goal for this chat", DEFAULT_GOAL, key="goal")
     channel = st.radio("Channel", ["LinkedIn", "Email"], horizontal=True)
 
     if channel == "LinkedIn":
         if st.button("Draft LinkedIn note + DM"):
             with st.spinner("Drafting..."):
-                ss.linkedin = draft_linkedin(p, ss.brief["markdown"], goal, ss.get("common", ""))
+                ss.linkedin = draft_linkedin(p, ss.brief["markdown"], goal, ensure_common_ground())
         if "linkedin" in ss:
             note = ss.linkedin["note"]
             copy_box(f"Connection note ({len(note)}/{NOTE_LIMIT} characters)", note)
@@ -225,7 +234,7 @@ def tab_outreach():
     else:
         if st.button("Draft email"):
             with st.spinner("Drafting..."):
-                ss.outreach = draft_outreach(p, ss.brief["markdown"], goal, ss.get("common", ""))
+                ss.outreach = draft_outreach(p, ss.brief["markdown"], goal, ensure_common_ground())
         if "outreach" in ss:
             subject, body = email_editor("out", ss.outreach)
             gmail_button("out", subject, body)
@@ -308,7 +317,7 @@ def tab_prep():
         st.caption("Tip: run Common ground in the Brief tab first so the plan uses your overlaps.")
     if st.button("Make prep sheet"):
         with st.spinner("Preparing your chat plan..."):
-            ss.prep = make_chat_prep(p, ss.brief["markdown"], ss.get("common", ""),
+            ss.prep = make_chat_prep(p, ss.brief["markdown"], ensure_common_ground(),
                                      load_my_profile(), goal)
     if "prep" in ss:
         st.markdown(ss.prep)

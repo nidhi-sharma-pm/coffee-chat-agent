@@ -5,6 +5,19 @@ TONE = (
     "Sound like a real person, not a template."
 )
 
+HOOK = """How to use common ground (follow exactly):
+- Only use an overlap if it is STRONG and specific: the same college, the same company (past
+  or present), or very similar work (same domain, same kind of product, same career switch).
+- Never use country, nationality, city or region (for example "India" or "Bangalore"), and
+  never generic things like "both love tech" or "both in product".
+- Don't announce it. No "we both", "like you", "same as you", "fellow", "we have in common".
+  Instead, mention the fact about ME in passing, so they notice the link themselves.
+  Good: "I spent two years as an engineer at a fintech startup before moving into product."
+  Bad: "Like you, I moved from engineering to product!"
+- One light mention, at most one sentence. The message stays about them and the ask.
+- If there is no strong overlap, leave it out and use one specific detail from the brief
+  that is NOT marked [UNVERIFIED]."""
+
 PROFILE_EXTRACT = """Extract fields from this pasted profile. Use ONLY what the text says.
 If a field is not in the text, use null. Never guess or fill gaps.
 
@@ -52,8 +65,8 @@ My goal for this chat: {goal}
 </common_ground>
 
 {tone}
-Under 120 words. Hook: if common ground lists a strong overlap, lead with it. Otherwise mention
-one specific thing from the brief that is NOT marked [UNVERIFIED].
+{hook}
+Under 120 words.
 End with an easy yes/no ask. First line must be "Subject: ..." then a blank line, then the body."""
 
 THANK_YOU = """Draft a thank-you note to {name} after our coffee chat today.
@@ -121,10 +134,11 @@ My goal for this chat: {goal}
 {tone}
 Write two messages:
 1. "note": a connection request note. HARD LIMIT 280 characters including spaces.
-   Hook: if common ground lists a strong overlap, lead with it. Otherwise mention one
-   specific thing from the brief that is NOT marked [UNVERIFIED].
+   Follow the common ground rules below.
 2. "dm": the first message to send after they accept. Under 90 words. Ask for a
-   20-minute chat with an easy yes/no.
+   20-minute chat with an easy yes/no. Don't repeat the note's detail word for word.
+
+{hook}
 
 Return ONLY JSON: {{"note": "...", "dm": "..."}}"""
 
@@ -196,13 +210,15 @@ Write markdown with these sections:
 Bullets. Each names the overlap and ends with (strong), (medium) or (light).
 Only count overlaps visible in BOTH profiles: same school, company, city, industry, role,
 career switch, side projects, topics or communities. Don't stretch: "both like tech" is not
-common ground. If there's little overlap, say so honestly.
+common ground. Ignore country, nationality, city and region entirely. If there's little
+overlap, say so honestly.
 
 ## Where our paths differ
 1-3 bullets on things they've done that I'm trying to do. These make the best questions.
 
 ## How to use this in the chat
-- **Opener:** one natural first line built on the strongest overlap.
+- **Opener:** one natural first line that mentions the relevant fact about me in passing,
+  without saying "we both" or "like you".
 - **Bridge questions:** 3 questions that link my experience to theirs.
 - **What I can offer:** one thing from my profile that could be useful to them.
 - **Avoid:** one thing not to do (for example, overplaying a weak link)."""
@@ -230,8 +246,8 @@ My goal for this chat: {goal}
 Write markdown with these sections. Keep it scannable: I'll read it 5 minutes before the call.
 
 ## My 30-second intro
-3-4 sentences in first person, tailored to them: who I am, the overlap with them, and why I
-wanted to talk. Natural, not a pitch.
+3-4 sentences in first person, tailored to them: who I am (mention the fact that links to
+them in passing, never "we both" or "like you") and why I wanted to talk. Natural, not a pitch.
 
 ## 20-minute plan
 A short timeline: warm open (use the strongest overlap), main questions, what I can offer,
