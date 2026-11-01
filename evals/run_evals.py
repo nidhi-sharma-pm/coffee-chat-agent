@@ -1,6 +1,7 @@
 """Checks briefs for unflagged facts and facts that contradict the profile.
 
-Put 5-6 real profiles as .txt files in evals/profiles/ (gitignored), then:
+Put 5-6 real profiles in evals/profiles/ (gitignored) as .txt files or
+LinkedIn "Save to PDF" files, then:
     python evals/run_evals.py
 Exits with code 1 if any profile fails.
 """
@@ -12,7 +13,7 @@ sys.path.insert(0, str(ROOT))
 
 from agent.brief import make_brief  # noqa: E402
 from agent.llm import extract  # noqa: E402
-from agent.profile import parse_profile  # noqa: E402
+from agent.profile import parse_profile, pdf_to_text  # noqa: E402
 from agent.prompts import EVAL_JUDGE  # noqa: E402
 
 PROFILES = ROOT / "evals" / "profiles"
@@ -20,14 +21,17 @@ RESULTS = ROOT / "evals" / "results"
 
 
 def main():
-    files = sorted(PROFILES.glob("*.txt"))
+    files = sorted(f for f in PROFILES.iterdir() if f.suffix in (".txt", ".pdf"))
     if not files:
-        sys.exit(f"No profiles found. Add .txt files to {PROFILES}")
+        sys.exit(f"No profiles found. Add .txt or .pdf files to {PROFILES}")
     RESULTS.mkdir(exist_ok=True)
 
     rows, failed = [], 0
     for f in files:
-        text = f.read_text()
+        text = pdf_to_text(f) if f.suffix == ".pdf" else f.read_text()
+        if not text:
+            print(f"Skipping {f.name}: no readable text")
+            continue
         brief = make_brief(parse_profile(text))
         wrong = extract(EVAL_JUDGE.format(profile=text, brief=brief["markdown"]))["contradictions"]
         ok = not brief["unflagged"] and not wrong

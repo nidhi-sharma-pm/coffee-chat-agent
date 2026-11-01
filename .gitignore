@@ -225,4 +225,6 @@ token.json
 
 # Coffee chat agent: real people's profiles and eval output stay local
 evals/profiles/*.txt
+evals/profiles/*.pdf
+.DS_Store
 evals/results/
