@@ -47,8 +47,13 @@ My goal for this chat: {goal}
 {brief}
 </brief>
 
+<common_ground>
+{common}
+</common_ground>
+
 {tone}
-Under 120 words. Mention one specific thing from the brief that is NOT marked [UNVERIFIED].
+Under 120 words. Hook: if common ground lists a strong overlap, lead with it. Otherwise mention
+one specific thing from the brief that is NOT marked [UNVERIFIED].
 End with an easy yes/no ask. First line must be "Subject: ..." then a blank line, then the body."""
 
 THANK_YOU = """Draft a thank-you note to {name} after our coffee chat today.
@@ -109,10 +114,15 @@ My goal for this chat: {goal}
 {brief}
 </brief>
 
+<common_ground>
+{common}
+</common_ground>
+
 {tone}
 Write two messages:
 1. "note": a connection request note. HARD LIMIT 280 characters including spaces.
-   Mention one specific thing from the brief that is NOT marked [UNVERIFIED].
+   Hook: if common ground lists a strong overlap, lead with it. Otherwise mention one
+   specific thing from the brief that is NOT marked [UNVERIFIED].
 2. "dm": the first message to send after they accept. Under 90 words. Ask for a
    20-minute chat with an easy yes/no.
 
@@ -169,3 +179,74 @@ Under 80 words. No subject line.
 - later: thank them and say I'll reach out again in a few weeks.
 - question: answer only from what I've told you. If you can't, write [ADD ANSWER] where I need to fill in.
 Return only the message."""
+
+COMMON_GROUND = """Compare my profile with theirs to find genuine common ground for a coffee chat.
+
+<my_profile>
+{me}
+</my_profile>
+
+<their_profile>
+{them}
+</their_profile>
+
+Write markdown with these sections:
+
+## What we have in common
+Bullets. Each names the overlap and ends with (strong), (medium) or (light).
+Only count overlaps visible in BOTH profiles: same school, company, city, industry, role,
+career switch, side projects, topics or communities. Don't stretch: "both like tech" is not
+common ground. If there's little overlap, say so honestly.
+
+## Where our paths differ
+1-3 bullets on things they've done that I'm trying to do. These make the best questions.
+
+## How to use this in the chat
+- **Opener:** one natural first line built on the strongest overlap.
+- **Bridge questions:** 3 questions that link my experience to theirs.
+- **What I can offer:** one thing from my profile that could be useful to them.
+- **Avoid:** one thing not to do (for example, overplaying a weak link)."""
+
+CHAT_PREP = """Write my one-page prep sheet for a 20-minute coffee chat with {name}.
+
+My goal for this chat: {goal}
+
+<my_profile>
+{me}
+</my_profile>
+
+<their_profile>
+{them}
+</their_profile>
+
+<brief>
+{brief}
+</brief>
+
+<common_ground>
+{common}
+</common_ground>
+
+Write markdown with these sections. Keep it scannable: I'll read it 5 minutes before the call.
+
+## My 30-second intro
+3-4 sentences in first person, tailored to them: who I am, the overlap with them, and why I
+wanted to talk. Natural, not a pitch.
+
+## 20-minute plan
+A short timeline: warm open (use the strongest overlap), main questions, what I can offer,
+close. Give minutes for each part.
+
+## Questions, best first
+6 questions. Mark the 2 I must ask with **(must ask)**. Build them on the brief and common
+ground, never on facts marked [UNVERIFIED]. No questions they could answer with a Google search.
+
+## If the conversation stalls
+2 backup topics from the brief or common ground.
+
+## Close and ask
+One specific, small ask that fits my goal (advice, a resource, an intro to one person).
+Not a job. Plus the exact line to say.
+
+## Don't
+2 things to avoid with this person."""

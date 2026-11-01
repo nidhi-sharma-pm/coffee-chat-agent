@@ -13,13 +13,14 @@ def split_email(text):
     return "", text.strip()
 
 
-def draft_outreach(profile, brief_md, goal):
+def draft_outreach(profile, brief_md, goal, common=""):
     text, _ = draft(OUTREACH.format(
         name=profile.get("name") or "them",
         me=os.getenv("YOUR_BLURB", ""),
         goal=goal,
         profile=profile_for_prompt(profile),
         brief=brief_md,
+        common=common or "(none found)",
         tone=TONE,
     ), max_tokens=2000)
     subject, body = split_email(text)

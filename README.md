@@ -8,12 +8,13 @@ AI agent that helps me prep for and follow up on networking coffee chats.
 | Tab | What happens | Model |
 |---|---|---|
 | Today | Who hasn't replied in 7+ days (nudge draft) and who is due a check-in after 4+ weeks. One-click status updates | Haiku / Sonnet |
-| 1. Profile | Upload their LinkedIn PDF (More → Save to PDF) or paste a profile, get clean fields. The PDF is read on your Mac | Haiku |
-| 2. Brief | Prep brief with web search. Every fact has a source link or is marked `[UNVERIFIED]` | Sonnet |
+| 1. Profile | Save your own profile once (kept in `my_profile.txt`, gitignored). Upload their LinkedIn PDF (More → Save to PDF) or paste a profile, get clean fields. The PDF is read on your Mac | Haiku |
+| 2. Brief | Prep brief with web search. Every fact has a source link or is marked `[UNVERIFIED]`. Then **Common ground**: compares your saved profile with theirs, with an opener, bridge questions and what you can offer | Sonnet |
 | 3. Outreach | LinkedIn connection note (under 300 chars) + first DM with copy buttons, or an email saved to Gmail drafts | Sonnet |
 | 4. Reply | Paste their LinkedIn reply: it reads yes / no / later / question, drafts your response (with your open times if yes) and updates the tracker | Haiku + Sonnet |
 | 5. Schedule | Finds open slots in your calendar, creates a `[DRAFT]` event without emailing anyone | Haiku |
-| 6. Follow-up | Thank-you or check-in drafted from your notes; notes are saved for future check-ins | Sonnet |
+| 6. Chat prep | One-page sheet to read before the call: your tailored 30-second intro, a 20-minute plan, questions (best first), backup topics, the close-and-ask line, and what to avoid. Downloadable | Sonnet |
+| 7. Follow-up | Thank-you or check-in drafted from your notes; notes are saved for future check-ins | Sonnet |
 
 The tracker is a Google Sheet that updates when you click "I sent it" buttons.
 

@@ -1,7 +1,11 @@
+from pathlib import Path
+
 from pypdf import PdfReader
 
 from agent.llm import extract
 from agent.prompts import PROFILE_EXTRACT
+
+MY_PROFILE = Path(__file__).resolve().parent.parent / "my_profile.txt"  # gitignored
 
 FIELDS = ["name", "current_role", "company", "past_roles", "education",
           "location", "topics", "linkedin_url"]
@@ -31,3 +35,11 @@ def profile_for_prompt(profile):
         if v:
             lines.append(f"{f}: {', '.join(v) if isinstance(v, list) else v}")
     return "\n".join(lines)
+
+
+def load_my_profile():
+    return MY_PROFILE.read_text() if MY_PROFILE.exists() else ""
+
+
+def save_my_profile(text):
+    MY_PROFILE.write_text(text.strip())
