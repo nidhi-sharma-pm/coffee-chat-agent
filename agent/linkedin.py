@@ -3,7 +3,7 @@ import os
 
 from agent.llm import draft, parse_json, quick
 from agent.profile import profile_for_prompt
-from agent.prompts import LINKEDIN, NUDGE, SHORTEN, TONE
+from agent.prompts import HOOK, LINKEDIN, NUDGE, SHORTEN, TONE
 
 NOTE_LIMIT = 300  # LinkedIn's connection note limit
 
@@ -18,6 +18,7 @@ def draft_linkedin(profile, brief_md, goal, common=""):
         brief=brief_md,
         common=common or "(none found)",
         tone=TONE,
+        hook=HOOK,
     ), max_tokens=2000)
     try:
         data = parse_json(text)
