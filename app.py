@@ -5,16 +5,19 @@ import streamlit as st
 
 from agent.attention import STATUSES, due_today
 from agent.brief import make_brief
+from agent.common import find_common_ground
 from agent.followup import draft_check_in, draft_thank_you
 from agent.linkedin import NOTE_LIMIT, draft_linkedin, draft_nudge
 from agent.outreach import draft_outreach
-from agent.profile import parse_profile, pdf_to_text
+from agent.prep import make_chat_prep
+from agent.profile import load_my_profile, parse_profile, pdf_to_text, save_my_profile
 from agent.replies import INTENTS, draft_reply_response, triage_reply
 
 st.set_page_config(page_title="Coffee Chat Agent", layout="wide")
 st.title("Coffee Chat Agent")
 st.caption("Drafts only. Nothing is ever sent. You review and hit send yourself.")
 ss = st.session_state
+DEFAULT_GOAL = "Learn how they moved into their current role"
 
 
 # ---------- helpers ----------
@@ -131,7 +134,28 @@ def load_pdf():
         ss.profile_text = text
 
 
+def load_my_pdf():
+    f = ss.get("my_pdf")
+    if f is not None and (text := pdf_to_text(f)):
+        ss.my_text = text
+
+
+def my_profile_section():
+    saved = load_my_profile()
+    with st.expander("Your own profile " + ("(saved)" if saved else "(add once to find common ground)"),
+                     expanded=not saved):
+        st.file_uploader("Upload your LinkedIn PDF", type="pdf", key="my_pdf", on_change=load_my_pdf)
+        if "my_text" not in ss:
+            ss.my_text = saved
+        st.text_area("Or paste your profile", height=200, key="my_text")
+        if st.button("Save my profile", disabled=not ss.my_text.strip()):
+            save_my_profile(ss.my_text)
+            st.success("Saved on this Mac (my_profile.txt, never uploaded to GitHub).")
+
+
 def tab_profile():
+    my_profile_section()
+    st.divider()
     st.file_uploader("Upload their LinkedIn PDF (on their profile: More → Save to PDF)",
                      type="pdf", key="profile_pdf", on_change=load_pdf)
     if ss.get("pdf_unreadable"):
@@ -142,7 +166,7 @@ def tab_profile():
     if st.button("Parse profile", disabled=not text.strip()):
         with st.spinner("Reading profile..."):
             ss.profile = parse_profile(text)
-            for k in ("brief", "linkedin", "outreach", "followup", "slots", "reply"):
+            for k in ("brief", "common", "prep", "linkedin", "outreach", "followup", "slots", "reply"):
                 ss.pop(k, None)
     if "profile" in ss:
         st.json({k: v for k, v in ss.profile.items() if k != "raw"})
@@ -164,18 +188,31 @@ def tab_brief():
             for s in b["sources"]:
                 st.markdown(f"- [{s['title']}]({s['url']})")
 
+    st.divider()
+    st.subheader("Common ground")
+    me = load_my_profile()
+    if not me:
+        st.info("Save your own profile in the Profile tab to see what you have in common.")
+        return
+    if st.button("Find what we have in common"):
+        with st.spinner("Comparing profiles..."):
+            ss.common = find_common_ground(ss.profile, me)
+    if "common" in ss:
+        st.markdown(ss.common)
+        st.caption("Outreach drafts will use the strongest overlap as the hook.")
+
 
 def tab_outreach():
     if not need("brief", "Generate a brief first."):
         return
     p = ss.profile
-    goal = st.text_input("Your goal for this chat", "Learn how they moved into their current role")
+    goal = st.text_input("Your goal for this chat", DEFAULT_GOAL, key="goal")
     channel = st.radio("Channel", ["LinkedIn", "Email"], horizontal=True)
 
     if channel == "LinkedIn":
         if st.button("Draft LinkedIn note + DM"):
             with st.spinner("Drafting..."):
-                ss.linkedin = draft_linkedin(p, ss.brief["markdown"], goal)
+                ss.linkedin = draft_linkedin(p, ss.brief["markdown"], goal, ss.get("common", ""))
         if "linkedin" in ss:
             note = ss.linkedin["note"]
             copy_box(f"Connection note ({len(note)}/{NOTE_LIMIT} characters)", note)
@@ -188,7 +225,7 @@ def tab_outreach():
     else:
         if st.button("Draft email"):
             with st.spinner("Drafting..."):
-                ss.outreach = draft_outreach(p, ss.brief["markdown"], goal)
+                ss.outreach = draft_outreach(p, ss.brief["markdown"], goal, ss.get("common", ""))
         if "outreach" in ss:
             subject, body = email_editor("out", ss.outreach)
             gmail_button("out", subject, body)
@@ -262,6 +299,23 @@ def tab_schedule():
         st.warning("No free slots in the next 7 days.")
 
 
+def tab_prep():
+    if not need("brief", "Generate a brief first (and common ground, for a better prep sheet)."):
+        return
+    p = ss.profile
+    goal = st.text_input("Your goal for this chat", ss.get("goal", DEFAULT_GOAL), key="prep_goal")
+    if "common" not in ss:
+        st.caption("Tip: run Common ground in the Brief tab first so the plan uses your overlaps.")
+    if st.button("Make prep sheet"):
+        with st.spinner("Preparing your chat plan..."):
+            ss.prep = make_chat_prep(p, ss.brief["markdown"], ss.get("common", ""),
+                                     load_my_profile(), goal)
+    if "prep" in ss:
+        st.markdown(ss.prep)
+        name = (p.get("name") or "chat").lower().replace(" ", "-")
+        st.download_button("Download prep sheet", ss.prep, file_name=f"prep-{name}.md")
+
+
 def tab_followup():
     if not need("profile", "Parse a profile first."):
         return
@@ -285,8 +339,8 @@ def tab_followup():
 
 
 tabs = st.tabs(["Today", "1. Profile", "2. Brief", "3. Outreach", "4. Reply",
-                "5. Schedule", "6. Follow-up"])
+                "5. Schedule", "6. Chat prep", "7. Follow-up"])
 for tab, render in zip(tabs, [tab_today, tab_profile, tab_brief, tab_outreach, tab_reply,
-                              tab_schedule, tab_followup]):
+                              tab_schedule, tab_prep, tab_followup]):
     with tab:
         render()

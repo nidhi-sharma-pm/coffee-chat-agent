@@ -228,3 +228,4 @@ evals/profiles/*.txt
 evals/profiles/*.pdf
 .DS_Store
 evals/results/
+my_profile.txt

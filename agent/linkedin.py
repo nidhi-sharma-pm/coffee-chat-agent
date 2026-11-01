@@ -8,7 +8,7 @@ from agent.prompts import LINKEDIN, NUDGE, SHORTEN, TONE
 NOTE_LIMIT = 300  # LinkedIn's connection note limit
 
 
-def draft_linkedin(profile, brief_md, goal):
+def draft_linkedin(profile, brief_md, goal, common=""):
     """Returns {"note": connection note, "dm": first message after they accept}."""
     text, _ = draft(LINKEDIN.format(
         name=profile.get("name") or "them",
@@ -16,6 +16,7 @@ def draft_linkedin(profile, brief_md, goal):
         goal=goal,
         profile=profile_for_prompt(profile),
         brief=brief_md,
+        common=common or "(none found)",
         tone=TONE,
     ), max_tokens=2000)
     try:
